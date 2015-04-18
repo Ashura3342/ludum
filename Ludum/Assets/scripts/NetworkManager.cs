@@ -4,7 +4,9 @@ using System.Collections;
 public class NetworkManager : MonoBehaviour
 {
     private const string typeName = "Ludum";
-    private const string gameName = "Test Ludum Reseau";
+    private string gameName = "Test Ludum Reseau";
+	private int port = 25000;
+	private const int listen = 5;
 
     private bool isRefreshingHostList = false;
     private HostData[] hostList;
@@ -15,17 +17,21 @@ public class NetworkManager : MonoBehaviour
     {
         if (!Network.isClient && !Network.isServer)
         {
-            if (GUI.Button(new Rect(100, 100, 250, 100), "Start Server"))
+			GUI.Label(new Rect(100, 100, 100, 25), "Server : Name");
+			gameName = GUI.TextField(new Rect(200, 100, 255, 25), gameName);
+			GUI.Label(new Rect(475, 100, 100, 20), "Port");
+			port = int.Parse(GUI.TextField(new Rect(500, 100, 100, 25), port.ToString()));
+            if (GUI.Button(new Rect(600, 100, 100, 25), "Start Server"))
                 StartServer();
 
-            if (GUI.Button(new Rect(100, 250, 250, 100), "Refresh Hosts"))
+            if (GUI.Button(new Rect(100, 125, 100, 25), "Refresh Hosts"))
                 RefreshHostList();
 
             if (hostList != null)
             {
                 for (int i = 0; i < hostList.Length; i++)
                 {
-                    if (GUI.Button(new Rect(400, 100 + (110 * i), 300, 100), hostList[i].gameName))
+                    if (GUI.Button(new Rect(100, 160 + (25 * i), 200, 25), hostList[i].gameName))
                         JoinServer(hostList[i]);
                 }
             }
@@ -34,7 +40,7 @@ public class NetworkManager : MonoBehaviour
 
     private void StartServer()
     {
-        Network.InitializeServer(5, 25000, !Network.HavePublicAddress());
+        Network.InitializeServer(listen, port, !Network.HavePublicAddress());
         MasterServer.RegisterHost(typeName, gameName);
     }
 
@@ -76,6 +82,6 @@ public class NetworkManager : MonoBehaviour
 
     private void SpawnPlayer()
     {
-        Network.Instantiate(playerPrefab, Vector3.up * 5, Quaternion.identity, 0);
+        Network.Instantiate(playerPrefab, transform.position + Vector3.up * 5, Quaternion.identity, 0);
     }
 }
