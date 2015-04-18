@@ -10,6 +10,7 @@ public class NetManage: MonoBehaviour {
 	};
 
 	public Type TypePlayer;
+	public GameObject PlayerSource;
 	public string Address;
 	public int Port;
 	public int Listen;
@@ -73,6 +74,8 @@ public class NetManage: MonoBehaviour {
 	void OnPlayerConnected(NetworkPlayer player)
 	{
 		Debug.Log ("Player " + _playerCount + " connected from " + player.ipAddress + ":" + player.port);
+		Network.Instantiate (PlayerSource, transform.position + Vector3.forward * 100, 
+		                     	Quaternion.AngleAxis(0, Vector3.zero), 0);
 		_playerCount++;
 	}
 
