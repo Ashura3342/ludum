@@ -15,6 +15,7 @@ public class NetManage: MonoBehaviour {
 	public int Listen;
 
 	private int _playerCount = 0;
+
 	void Start () {
 		if (TypePlayer == Type.SERVER)
 			Network.InitializeServer (Listen, Port, false);
