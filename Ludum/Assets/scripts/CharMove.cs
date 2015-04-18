@@ -12,6 +12,7 @@ public class CharMove : MonoBehaviour {
 	private Vector3 lastpos;
 	private float vertical_speed = 0.0f;
 	private CharacterController controller;
+	private NetworkView _netview;
 
 	bool is_grounded() {
 		if (lastpos.y == gameObject.transform.position.y && vertical_speed < -gravity / 10.0f) {
@@ -26,6 +27,7 @@ public class CharMove : MonoBehaviour {
 		controller = GetComponent<CharacterController>();
 		gameObject.transform.Translate (new Vector3 (0, 1, 0));
 		lastpos = gameObject.transform.position;
+		_netview = gameObject.GetComponent<NetworkView> ();
 	}
 
 	void Update () 
@@ -37,16 +39,15 @@ public class CharMove : MonoBehaviour {
 
 		if (vertical_speed < - 20)
 			vertical_speed = -20;
-		if (Input.GetButton (jumpButton) == true && is_grounded()) {
+		if (Input.GetButton (jumpButton) == true && is_grounded ()) {
 			vertical_speed = jump_high;
 		}
-
-		if (Input.GetAxis (verticalAxis) != 0 || Input.GetAxis (horizontalAxis) != 0)
-		{
-			moveDirection = new Vector3(Input.GetAxis(horizontalAxis), 0, Input.GetAxis(verticalAxis));
-			moveDirection = transform.TransformDirection(moveDirection);
+	
+		if (_netview.isMine && (Input.GetAxis (verticalAxis) != 0 || Input.GetAxis (horizontalAxis) != 0)) {
+			moveDirection = new Vector3 (Input.GetAxis (horizontalAxis), 0, Input.GetAxis (verticalAxis));
+			moveDirection = transform.TransformDirection (moveDirection);
 			moveDirection *= move_speed;
-			controller.Move(moveDirection * Time.deltaTime);
+			controller.Move (moveDirection * Time.deltaTime);
 			//animation.Play();
 		}
 		lastpos = gameObject.transform.position;
