@@ -13,6 +13,8 @@ public class NetManage: MonoBehaviour {
 	public string Address;
 	public int Port;
 	public int Listen;
+
+	private int _playerCount = 0;
 	void Start () {
 		if (TypePlayer == Type.SERVER)
 			Network.InitializeServer (Listen, Port, false);
@@ -39,4 +41,50 @@ public class NetManage: MonoBehaviour {
 	{
 		Network.Disconnect (10);
 	}
+
+	void OnConnectedToServer()
+	{
+		Debug.Log ("Connected to Server");
+	}
+
+	void OnDisconnectedFromServer(NetworkDisconnection info) {
+		if (Network.isServer) {
+			Debug.Log ("Local Server connection disconnected");
+			_playerCount = 0;
+		} else {
+			if (info == NetworkDisconnection.LostConnection)
+				Debug.Log ("Lost connection to the Server");
+			else
+				Debug.Log ("Disconnected from the Server");
+		}
+	}
+
+	void OnFailedToConnect(NetworkConnectionError error)
+	{
+		Debug.Log ("Could not connect to server: " + error);
+	}
+
+	void OnNetworkInstantiate(NetworkMessageInfo info)
+	{
+		Debug.Log ("New Object instantiated by " + info.sender);
+	}
+
+	void OnPlayerConnected(NetworkPlayer player)
+	{
+		Debug.Log ("Player " + _playerCount + " connected from " + player.ipAddress + ":" + player.port);
+		_playerCount++;
+	}
+
+	void OnPlayerDisconnected(NetworkPlayer player) {
+		Debug.Log("Clean up after player " + player);
+		Network.RemoveRPCs (player);
+		Network.DestroyPlayerObjects (player);
+		_playerCount--;
+	}
+
+	void OnServerInitialized() {
+		Debug.Log ("Server initialized and ready");
+		_playerCount = 0;
+	}
+	
 }
